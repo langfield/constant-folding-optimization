@@ -18,7 +18,7 @@ pub fn fold_val(v: Value) -> Value {
                 Expression::Value(v1) => *v1,
                 e1 => Value::Expression(Box::new(e1))
             }
-        _ => v.clone()
+        v1 => v1
     }
 }
 
