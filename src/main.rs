@@ -8,6 +8,9 @@ pub use ast::*;
 pub mod parser;
 pub use parser::*;
 
+pub mod optim;
+pub use optim::*;
+
 use std::fs;
 
 fn main() {
@@ -19,6 +22,7 @@ fn main() {
     let file = parse(&unparsed_file).expect("unsuccessful parse");
 
     // Perform constant folding.
+    let file = fold(file);
 
     // Write program to output.
     println!("Resulting program:\n\n{}", file);
