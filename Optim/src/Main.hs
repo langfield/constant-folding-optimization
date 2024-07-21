@@ -1,6 +1,10 @@
 module Main (main) where
 
+import Data.Map (Map)
+import Data.List (foldl')
 import Test.LeanCheck
+
+import qualified Data.Map as M
 
 -- =============================================================================
 --  Types
@@ -43,6 +47,28 @@ foldStmt (Assign var expr) = Assign var (foldExpr expr)
 
 fold :: Program -> Program
 fold (Program name inputs stmts) = Program name inputs (map foldStmt stmts)
+
+propagateVal :: Map String Int -> Value -> Value
+propagateVal consts  = undefined
+
+propagateExpr :: Map String Int -> Expr -> Expr
+propagateExpr consts (Binary v op e) = _ $ Binary (propagateVal consts v) op (propagateExpr consts e)
+propagateExpr consts (Val (Identifier s)) =
+  case M.lookup s consts of
+    Nothing -> Val (Identifier s)
+    Just n  -> Val (Int' n)
+propagateExpr _ (Val v) = Val v
+
+propagate1 :: (Map String Int, [Stmt]) -> Stmt -> (Map String Int, [Stmt])
+propagate1 (consts, result) (Assign var e) = (undefined, Assign var (propagateExpr consts e) : result)
+
+propagate :: Program -> Program
+propagate (Program name inputs stmts) = Program name inputs result
+  where
+    (consts, result) = foldl' propagate1 (M.empty, []) stmts
+
+optimize :: Program -> Program
+optimize = propagate . fold
 
 -- =============================================================================
 --  Enumerative testing
